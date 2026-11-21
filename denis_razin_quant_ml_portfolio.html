@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DR // Denis Razin — Applied Math, Quant, ML & Finance</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            bgBase: '#0a0d14',
+            bgCard: '#111622',
+            bgCardHover: '#161d2d',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body {
+      background-color: #0a0d14;
+      color: #e5e7eb;
+      background-image:
+        radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.055) 0%, transparent 40%),
+        radial-gradient(circle at 90% 15%, rgba(6, 182, 212, 0.06) 0%, transparent 42%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0d14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #374151;
+    }
+
+    .card-surface {
+      background-color: #111622;
+      border: 1px solid rgba(255, 255, 255, 0.075);
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+    .card-surface-hover:hover {
+      border-color: rgba(16, 185, 129, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px -12px rgba(16, 185, 129, 0.16);
+    }
+
+    /* Print styles: hide everything except the formatted CV sheet */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #111827 !important;
+        background-image: none !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      #cv-modal {
+        position: static !important;
+        display: block !important;
+        background: transparent !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+      #cv-modal-shell {
+        box-shadow: none !important;
+        border: none !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+      }
+      #cv-print-area {
+        color: #111827 !important;
+        background: #ffffff !important;
+        padding: 0 !important;
+      }
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Toast Notification -->
+  <div id="toast-container" class="no-print fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Top Navigation -->
+  <header class="no-print sticky top-0 z-40 bg-[#0a0d14]/85 backdrop-blur-md border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 gap-3">
+        <!-- Logo -->
+        <a href="#" class="flex items-center gap-2.5 group shrink-0">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono font-bold text-xs group-hover:bg-emerald-500/20 transition">
+            DR
+          </div>
+          <span class="font-mono font-semibold text-sm sm:text-base tracking-tight text-white">
+            DR <span class="text-emerald-400">//</span> <span data-i18n="nav_name">Denis Razin</span>
+          </span>
+        </a>
+
+        <!-- Desktop Nav Links -->
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-300">
+          <a href="#projects" class="hover:text-emerald-400 transition" data-i18n="nav_projects">Проекты</a>
+          <a href="#skills" class="hover:text-emerald-400 transition" data-i18n="nav_skills">Навыки</a>
+          <a href="#education" class="hover:text-emerald-400 transition" data-i18n="nav_education">Образование</a>
+          <a href="#achievements" class="hover:text-emerald-400 transition" data-i18n="nav_achievements">Достижения</a>
+        </nav>
+
+        <!-- Right Controls: RU/EN Toggle + Download CV -->
+        <div class="flex items-center gap-2.5">
+          <button
+            id="lang-toggle-btn"
+            onclick="toggleLanguage()"
+            class="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 font-mono text-xs font-semibold transition flex items-center gap-1.5"
+            aria-label="Switch language"
+          >
+            <span id="lang-ru-label" class="text-emerald-400">RU</span>
+            <span class="text-gray-600">/</span>
+            <span id="lang-en-label" class="text-gray-400">EN</span>
+          </button>
+
+          <button
+            onclick="openCvModal()"
+            class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-semibold text-xs sm:text-sm transition shadow-lg shadow-emerald-500/15"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span class="hidden sm:inline" data-i18n="btn_download_cv">Скачать резюме (PDF)</span>
+            <span class="sm:hidden" data-i18n="btn_download_cv_short">CV</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="no-print max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-24 space-y-24">
+
+    <!-- HERO SECTION -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+      <!-- Hero Left -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/25 text-cyan-300 font-mono text-xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span data-i18n="hero_tag">Applied Math &amp; CS · Quant · ML · Finance</span>
+        </div>
+
+        <div class="space-y-3">
+          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight" data-i18n="hero_name">
+            Разин Денис
+          </h1>
+          <p class="text-base sm:text-lg font-medium text-emerald-400" data-i18n="hero_role">
+            Студент совместного бакалавриата МФТИ и Центрального университета
+          </p>
+          <p class="text-gray-300 text-sm sm:text-base leading-relaxed" data-i18n="hero_bio">
+            Интересуюсь математикой, экономикой, финансами, алгоритмами и машинным обучением. Разбираюсь в математических основаниях экономики и финансов.
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center gap-3 pt-1">
+          <a
+            href="https://t.me/dionis_29"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-semibold text-sm transition shadow-lg shadow-emerald-500/15"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+            </svg>
+            <span>@dionis_29</span>
+          </a>
+
+          <button
+            onclick="openCvModal()"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-medium text-sm transition"
+          >
+            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span data-i18n="hero_cv_btn">Скачать резюме</span>
+          </button>
+        </div>
+
+        <!-- Email Copy + Mailto Row -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            onclick="copyEmail()"
+            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#111622] hover:bg-[#161d2d] border border-white/10 hover:border-cyan-400/40 text-xs sm:text-sm font-mono text-gray-200 transition"
+          >
+            <svg class="w-4 h-4 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <span>denis.razin.2007@gmail.com</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300" data-i18n="copy_badge">копировать</span>
+          </button>
+
+          <a
+            href="mailto:denis.razin.2007@gmail.com"
+            class="inline-flex items-center justify-center p-2 rounded-xl bg-[#111622] hover:bg-[#161d2d] border border-white/10 hover:border-emerald-400/40 text-gray-300 hover:text-emerald-400 transition"
+            title="mailto:denis.razin.2007@gmail.com"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero Right: Interactive Quant & Analytics Terminal -->
+      <div class="lg:col-span-7">
+        <div class="card-surface rounded-2xl p-4 sm:p-6 shadow-2xl">
+          <!-- Terminal Top Bar -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+              <span class="ml-2 font-mono text-xs text-gray-400">quant_analytics_terminal.py</span>
+            </div>
+            <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" data-i18n="term_verified">
+              VERIFIED PROJECT DATA
+            </span>
+          </div>
+
+          <!-- 3 Switchable Tabs -->
+          <div class="grid grid-cols-3 gap-1.5 bg-[#0a0d14] p-1.5 rounded-xl border border-white/5 my-4">
+            <button
+              id="tab-mc"
+              onclick="switchTerminalTab('mc')"
+              class="term-tab py-2 px-2 rounded-lg text-xs font-mono font-medium transition text-center bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
+              data-i18n="tab_mc"
+            >
+              Монте-Карло VaR
+            </button>
+            <button
+              id="tab-ml"
+              onclick="switchTerminalTab('ml')"
+              class="term-tab py-2 px-2 rounded-lg text-xs font-mono font-medium transition text-center text-gray-400 hover:text-gray-200 border border-transparent"
+              data-i18n="tab_ml"
+            >
+              НМИЦ Бурденко ML
+            </button>
+            <button
+              id="tab-sibur"
+              onclick="switchTerminalTab('sibur')"
+              class="term-tab py-2 px-2 rounded-lg text-xs font-mono font-medium transition text-center text-gray-400 hover:text-gray-200 border border-transparent"
+              data-i18n="tab_sibur"
+            >
+              Сибур FCF
+            </button>
+          </div>
+
+          <!-- Dynamic Chart Header & Badges -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h2 id="term-title" class="text-sm sm:text-base font-semibold text-white"></h2>
+              <p id="term-subtitle" class="text-xs text-gray-400 font-mono mt-0.5"></p>
+            </div>
+            <div id="term-badges" class="flex flex-wrap items-center gap-1.5 font-mono text-[11px]"></div>
+          </div>
+
+          <!-- Responsive Chart Canvas -->
+          <div class="relative h-64 sm:h-72 w-full">
+            <canvas id="terminalChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS SECTION -->
+    <section id="projects" class="space-y-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <div class="font-mono text-xs text-emerald-400 uppercase tracking-wider mb-1" data-i18n="sec_projects_kicker">
+            // Selected Works
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white" data-i18n="sec_projects_title">
+            Проекты и исследования
+          </h2>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="flex flex-wrap gap-2" id="project-filters">
+          <button onclick="filterProjects('all')" data-filter="all" class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium bg-emerald-500 text-gray-950 transition" data-i18n="filter_all">
+            Все (5)
+          </button>
+          <button onclick="filterProjects('quant_ml')" data-filter="quant_ml" class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium bg-white/5 text-gray-300 hover:bg-white/10 border border-white/10 transition">
+            Quant &amp; ML
+          </button>
+          <button onclick="filterProjects('finance')" data-filter="finance" class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium bg-white/5 text-gray-300 hover:bg-white/10 border border-white/10 transition">
+            Finance
+          </button>
+          <button onclick="filterProjects('analytics')" data-filter="analytics" class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium bg-white/5 text-gray-300 hover:bg-white/10 border border-white/10 transition">
+            Data Analytics
+          </button>
+        </div>
+      </div>
+
+      <!-- Projects Grid -->
+      <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- SKILLS SECTION -->
+    <section id="skills" class="space-y-8">
+      <div>
+        <div class="font-mono text-xs text-cyan-400 uppercase tracking-wider mb-1" data-i18n="sec_skills_kicker">
+          // Stack &amp; Toolkit
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white" data-i18n="sec_skills_title">
+          Ключевые навыки
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- 1. Programming -->
+        <div class="card-surface rounded-2xl p-5 space-y-3.5">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-white flex items-center gap-2 text-sm sm:text-base">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span data-i18n="skill_prog">Программирование</span>
+            </h3>
+            <span class="font-mono text-xs text-gray-500">01</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-mono text-xs">Python</span>
+            <span class="px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-mono text-xs">C++</span>
+          </div>
+        </div>
+
+        <!-- 2. Machine Learning & Data -->
+        <div class="card-surface rounded-2xl p-5 space-y-3.5 sm:col-span-2 lg:col-span-2">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-white flex items-center gap-2 text-sm sm:text-base">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span data-i18n="skill_ml">Machine Learning &amp; Data</span>
+            </h3>
+            <span class="font-mono text-xs text-gray-500">02</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-mono text-xs">Scikit-Learn</span>
+            <span class="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-mono text-xs">CatBoost</span>
+            <span class="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-mono text-xs">XGBoost</span>
+            <span class="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-mono text-xs">LightGBM</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-mono text-xs">Feature Engineering</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-mono text-xs">Model Validation</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-mono text-xs">Hyperparameter Tuning</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-mono text-xs">SHAP</span>
+            <span class="px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-mono text-xs">NumPy</span>
+            <span class="px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-mono text-xs">Pandas</span>
+            <span class="px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-mono text-xs">Matplotlib</span>
+          </div>
+        </div>
+
+        <!-- 3. Algorithms -->
+        <div class="card-surface rounded-2xl p-5 space-y-3.5">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-white flex items-center gap-2 text-sm sm:text-base">
+              <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+              <span data-i18n="skill_algo">Алгоритмы</span>
+            </h3>
+            <span class="font-mono text-xs text-gray-500">03</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-mono text-xs">Dynamic Programming</span>
+            <span class="px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-mono text-xs">Graph Algorithms</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-mono text-xs">Computational Geometry</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-mono text-xs">Binary Search</span>
+          </div>
+        </div>
+
+        <!-- 4. Finance & Economics -->
+        <div class="card-surface rounded-2xl p-5 space-y-3.5">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-white flex items-center gap-2 text-sm sm:text-base">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span data-i18n="skill_fin">Финансы и экономика</span>
+            </h3>
+            <span class="font-mono text-xs text-gray-500">04</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-mono text-xs">Financial Modeling</span>
+            <span class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-mono text-xs">Equity Research</span>
+            <span class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-mono text-xs">DCF &amp; Valuation</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-mono text-xs">Fundamental Analysis</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-mono text-xs">Microeconomics</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-mono text-xs">Game Theory</span>
+          </div>
+        </div>
+
+        <!-- 5. Languages & Soft Skills -->
+        <div class="card-surface rounded-2xl p-5 space-y-3.5">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-white flex items-center gap-2 text-sm sm:text-base">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span data-i18n="skill_soft">Языки и коммуникация</span>
+            </h3>
+            <span class="font-mono text-xs text-gray-500">05</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-mono text-xs">English (C1 / Fluent)</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-mono text-xs">Team Collaboration</span>
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-mono text-xs">Time Management</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDUCATION SECTION -->
+    <section id="education" class="space-y-8">
+      <div>
+        <div class="font-mono text-xs text-emerald-400 uppercase tracking-wider mb-1" data-i18n="sec_edu_kicker">
+          // Academic Background
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white" data-i18n="sec_edu_title">
+          Образование
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Formal Education Timeline (7 cols) -->
+        <div class="lg:col-span-7 card-surface rounded-2xl p-6 space-y-6">
+          <div class="relative pl-6 border-l border-emerald-500/30 space-y-7">
+            <!-- University -->
+            <div class="relative">
+              <span class="absolute -left-[29px] top-1.5 w-3 h-3 rounded-full bg-emerald-400 ring-4 ring-[#111622]"></span>
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <h3 class="font-bold text-white text-base sm:text-lg" data-i18n="edu_uni_title">
+                  МФТИ и Центральный университет (совместный бакалавриат)
+                </h3>
+                <span class="font-mono text-xs px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 shrink-0">
+                  2025 – 2029
+                </span>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2 mt-2">
+                <span class="text-xs sm:text-sm font-mono text-cyan-400" data-i18n="edu_uni_sub">
+                  Студент 2 курса · ФПМИ (МФТИ) и Математика и компьютерные науки (ЦУ), Москва
+                </span>
+                <span class="font-mono text-xs font-bold px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                  GPA: 8.43
+                </span>
+              </div>
+
+              <p class="text-xs sm:text-sm text-gray-400 mt-3 leading-relaxed" data-i18n="edu_uni_courses">
+                Профильные дисциплины: Математический анализ, Линейная алгебра, Математическая статистика, АиСД, Микроэкономика, Теория игр, Финансы, Машинное обучение.
+              </p>
+            </div>
+
+            <!-- Lyceum -->
+            <div class="relative">
+              <span class="absolute -left-[29px] top-1.5 w-3 h-3 rounded-full bg-gray-500 ring-4 ring-[#111622]"></span>
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h3 class="font-semibold text-gray-200 text-sm sm:text-base" data-i18n="edu_school_title">
+                  Физико-математический лицей №131, г. Казань
+                </h3>
+                <span class="font-mono text-xs text-gray-400">2020 – 2025</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Education Compact Grid (5 cols) -->
+        <div class="lg:col-span-5 card-surface rounded-2xl p-6 space-y-4">
+          <h3 class="font-semibold text-white text-base flex items-center gap-2">
+            <span class="text-cyan-400 font-mono">#</span>
+            <span data-i18n="extra_edu_title">Дополнительное образование</span>
+          </h3>
+
+          <div class="space-y-2.5 text-xs sm:text-sm">
+            <div class="p-3 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between gap-3">
+              <div>
+                <div class="text-white font-semibold" data-i18n="extra_1_name">Т-поколение</div>
+                <div class="text-gray-400 text-xs mt-0.5" data-i18n="extra_1_desc">Алгоритмы и структуры данных (АиСД)</div>
+              </div>
+              <span class="font-mono text-xs text-gray-400 shrink-0">2023–2024</span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between gap-3">
+              <div>
+                <div class="text-white font-semibold" data-i18n="extra_2_name">Яндекс Лицей</div>
+                <div class="text-gray-400 text-xs mt-0.5" data-i18n="extra_2_desc">Промышленное программирование на Python</div>
+              </div>
+              <span class="font-mono text-xs text-gray-400 shrink-0">2022–2023</span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between gap-3">
+              <div>
+                <div class="text-white font-semibold" data-i18n="extra_3_name">Олмат.экономика</div>
+                <div class="text-gray-400 text-xs mt-0.5" data-i18n="extra_3_desc">Олимпиадная экономика</div>
+              </div>
+              <span class="font-mono text-xs text-gray-400 shrink-0">2023–2025</span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between gap-3">
+              <div>
+                <div class="text-white font-semibold" data-i18n="extra_4_name">Олмат.бизнес</div>
+                <div class="text-gray-400 text-xs mt-0.5" data-i18n="extra_4_desc">Бизнес-аналитика и кейсы</div>
+              </div>
+              <span class="font-mono text-xs text-gray-400 shrink-0">2024–2025</span>
+            </div>
+
+            <div class="p-3 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between gap-3">
+              <div>
+                <div class="text-white font-semibold">GO! English</div>
+                <div class="text-gray-400 text-xs mt-0.5" data-i18n="extra_5_desc">Английский язык (уровень C1)</div>
+              </div>
+              <span class="font-mono text-xs text-emerald-400 shrink-0">2022–2024 · C1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACHIEVEMENTS & ACTIVITIES SECTION -->
+    <section id="achievements" class="space-y-8">
+      <div>
+        <div class="font-mono text-xs text-indigo-400 uppercase tracking-wider mb-1" data-i18n="sec_ach_kicker">
+          // Honors &amp; Community
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold text-white" data-i18n="sec_ach_title">
+          Достижения и активности
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Scholarships & Olympiads (7 cols) -->
+        <div class="lg:col-span-7 card-surface rounded-2xl p-6 space-y-4">
+          <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+            <span data-i18n="ach_scholarships_title">Стипендии и олимпиады</span>
+          </h3>
+
+          <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/25">
+            <div class="font-semibold text-amber-300 text-sm sm:text-base" data-i18n="ach_potanin">
+              Лауреат именной стипендии Владимира Потанина 2026
+            </div>
+          </div>
+
+          <ul class="space-y-3 text-sm text-gray-300">
+            <li class="flex items-start gap-2.5">
+              <span class="text-emerald-400 font-mono mt-0.5">▹</span>
+              <span data-i18n="ach_vsosh">Победитель регионального этапа ВсОШ по экономике</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-emerald-400 font-mono mt-0.5">▹</span>
+              <span data-i18n="ach_econ_olymp">Призёр олимпиад «Сибириада», «МОШ», «Миссия выполнима», «Плехановская» по экономике</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-emerald-400 font-mono mt-0.5">▹</span>
+              <span data-i18n="ach_math_olymp">Призёр олимпиады «Миссия выполнима» по математике</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Student Activities (5 cols) -->
+        <div class="lg:col-span-5 card-surface rounded-2xl p-6 space-y-4">
+          <h3 class="text-base sm:text-lg font-bold text-white flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+            <span data-i18n="ach_activities_title">Студенческие активности</span>
+          </h3>
+
+          <ul class="space-y-3 text-sm text-gray-300">
+            <li class="p-3 rounded-xl bg-white/[0.03] border border-white/5" data-i18n="act_1">
+              Член сборных ЦУ по математике и экономике
+            </li>
+            <li class="p-3 rounded-xl bg-white/[0.03] border border-white/5" data-i18n="act_2">
+              Дважды член списка лучших студентов ЦУ
+            </li>
+            <li class="p-3 rounded-xl bg-white/[0.03] border border-white/5" data-i18n="act_3">
+              Куратор первокурсников в ЦУ
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="no-print border-t border-white/10 bg-[#0a0d14] py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <div class="font-mono font-bold text-white text-sm">
+          DR <span class="text-emerald-400">//</span> <span data-i18n="footer_name">Разин Денис</span>
+        </div>
+        <p class="text-xs text-gray-500 mt-1" data-i18n="footer_sub">МФТИ × Центральный университет · Москва</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          onclick="copyEmail()"
+          class="px-3.5 py-2 rounded-xl bg-[#111622] hover:bg-[#161d2d] border border-white/10 text-xs font-mono text-gray-200 transition"
+        >
+          denis.razin.2007@gmail.com
+        </button>
+        <a
+          href="https://t.me/dionis_29"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-semibold text-xs transition"
+        >
+          Telegram @dionis_29
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- PROJECT DETAILS MODAL -->
+  <div id="project-modal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto" onclick="closeProjectModal(event)">
+    <div class="card-surface rounded-2xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl relative my-8" onclick="event.stopPropagation()">
+      <button onclick="closeProjectModal()" class="absolute top-5 right-5 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition" aria-label="Close">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div id="modal-body" class="space-y-5"></div>
+    </div>
+  </div>
+
+  <!-- PRINT-READY CV MODAL -->
+  <div id="cv-modal" class="fixed inset-0 z-50 hidden items-start justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-6 overflow-y-auto" onclick="closeCvModal(event)">
+    <div id="cv-modal-shell" class="bg-white text-gray-900 rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden my-4" onclick="event.stopPropagation()">
+      <!-- Modal Action Bar (Hidden on Print) -->
+      <div class="no-print flex items-center justify-between gap-3 px-6 py-4 bg-[#111622] text-white border-b border-white/10">
+        <span class="font-mono text-xs sm:text-sm text-gray-200" data-i18n="cv_modal_title">Предпросмотр резюме (PDF)</span>
+        <div class="flex items-center gap-2">
+          <button
+            onclick="window.print()"
+            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-semibold text-xs sm:text-sm transition"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span data-i18n="cv_print_btn">Сохранить как PDF / Печать</span>
+          </button>
+          <button onclick="closeCvModal()" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 transition" aria-label="Close">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Formatted Resume Sheet -->
+      <div id="cv-print-area" class="p-6 sm:p-10 text-sm leading-relaxed space-y-5"></div>
+    </div>
+  </div>
+
+  <!-- APPLICATION SCRIPT -->
+  <script>
+    let currentLang = 'ru';
+    let currentFilter = 'all';
+    let currentTab = 'mc';
+    let terminalChartInstance = null;
+
+    // --------------------------------------------------------
+    // TRANSLATIONS DICTIONARY (100% RU & EN)
+    // --------------------------------------------------------
+    const i18n = {
+      ru: {
+        nav_name: 'Разин Денис',
+        nav_projects: 'Проекты',
+        nav_skills: 'Навыки',
+        nav_education: 'Образование',
+        nav_achievements: 'Достижения',
+        btn_download_cv: 'Скачать резюме (PDF)',
+        btn_download_cv_short: 'CV',
+        hero_tag: 'Applied Math & CS · Quant · ML · Finance',
+        hero_name: 'Разин Денис',
+        hero_role: 'Студент совместного бакалавриата МФТИ и Центрального университета',
+        hero_bio: 'Интересуюсь математикой, экономикой, финансами, алгоритмами и машинным обучением. Разбираюсь в математических основаниях экономики и финансов.',
+        hero_cv_btn: 'Скачать резюме',
+        copy_badge: 'копировать',
+        toast_copied: 'Email скопирован: denis.razin.2007@gmail.com',
+        term_verified: 'РЕАЛЬНЫЕ ДАННЫЕ ПРОЕКТОВ',
+        tab_mc: 'Монте-Карло VaR',
+        tab_ml: 'НМИЦ Бурденко ML',
+        tab_sibur: 'Сибур FCF',
+        sec_projects_kicker: '// Избранные работы',
+        sec_projects_title: 'Проекты и исследования',
+        filter_all: 'Все (5)',
+        sec_skills_kicker: '// Стек и инструменты',
+        sec_skills_title: 'Ключевые навыки',
+        skill_prog: 'Программирование',
+        skill_ml: 'Machine Learning & Data',
+        skill_algo: 'Алгоритмы',
+        skill_fin: 'Финансы и экономика',
+        skill_soft: 'Языки и коммуникация',
+        sec_edu_kicker: '// Академический трек',
+        sec_edu_title: 'Образование',
+        edu_uni_title: 'МФТИ и Центральный университет (совместный бакалавриат)',
+        edu_uni_sub: 'Студент 2 курса · ФПМИ (МФТИ) и Математика и компьютерные науки (ЦУ), Москва',
+        edu_uni_courses: 'Профильные дисциплины: Математический анализ, Линейная алгебра, Математическая статистика, АиСД, Микроэкономика, Теория игр, Финансы, Машинное обучение.',
+        edu_school_title: 'Физико-математический лицей №131, г. Казань',
+        extra_edu_title: 'Дополнительное образование',
+        extra_1_name: 'Т-поколение',
+        extra_1_desc: 'Алгоритмы и структуры данных (АиСД)',
+        extra_2_name: 'Яндекс Лицей',
+        extra_2_desc: 'Промышленное программирование на Python',
+        extra_3_name: 'Олмат.экономика',
+        extra_3_desc: 'Олимпиадная экономика',
+        extra_4_name: 'Олмат.бизнес',
+        extra_4_desc: 'Бизнес-аналитика и кейсы',
+        extra_5_desc: 'Английский язык (уровень C1)',
+        sec_ach_kicker: '// Награды и сообщество',
+        sec_ach_title: 'Достижения и активности',
+        ach_scholarships_title: 'Стипендии и олимпиады',
+        ach_potanin: 'Лауреат именной стипендии Владимира Потанина 2026',
+        ach_vsosh: 'Победитель регионального этапа ВсОШ по экономике',
+        ach_econ_olymp: 'Призёр олимпиад «Сибириада», «МОШ», «Миссия выполнима», «Плехановская» по экономике',
+        ach_math_olymp: 'Призёр олимпиады «Миссия выполнима» по математике',
+        ach_activities_title: 'Студенческие активности',
+        act_1: 'Член сборных ЦУ по математике и экономике',
+        act_2: 'Дважды член списка лучших студентов ЦУ',
+        act_3: 'Куратор первокурсников в ЦУ',
+        footer_name: 'Разин Денис',
+        footer_sub: 'МФТИ × Центральный университет · Москва',
+        details_btn: 'Подробнее',
+        cv_modal_title: 'Предпросмотр резюме (PDF)',
+        cv_print_btn: 'Сохранить как PDF / Печать',
+      },
+      en: {
+        nav_name: 'Denis Razin',
+        nav_projects: 'Projects',
+        nav_skills: 'Skills',
+        nav_education: 'Education',
+        nav_achievements: 'Achievements',
+        btn_download_cv: 'Download CV (PDF)',
+        btn_download_cv_short: 'CV',
+        hero_tag: 'Applied Math & CS · Quant · ML · Finance',
+        hero_name: 'Denis Razin',
+        hero_role: 'Joint B.Sc. Student at MIPT & Central University',
+        hero_bio: 'Interested in mathematics, economics, finance, algorithms, and machine learning. Focused on the mathematical foundations of economics and finance.',
+        hero_cv_btn: 'Download CV',
+        copy_badge: 'copy',
+        toast_copied: 'Email copied: denis.razin.2007@gmail.com',
+        term_verified: 'VERIFIED PROJECT DATA',
+        tab_mc: 'Monte Carlo VaR',
+        tab_ml: 'Burdenko ML',
+        tab_sibur: 'Sibur FCF',
+        sec_projects_kicker: '// Selected Works',
+        sec_projects_title: 'Projects & Research',
+        filter_all: 'All (5)',
+        sec_skills_kicker: '// Stack & Toolkit',
+        sec_skills_title: 'Core Skills',
+        skill_prog: 'Programming',
+        skill_ml: 'Machine Learning & Data',
+        skill_algo: 'Algorithms',
+        skill_fin: 'Finance & Economics',
+        skill_soft: 'Languages & Soft Skills',
+        sec_edu_kicker: '// Academic Background',
+        sec_edu_title: 'Education',
+        edu_uni_title: 'MIPT & Central University (Joint Bachelor’s Program)',
+        edu_uni_sub: '2nd-Year Student · FPMI (MIPT) & Applied Math and CS (CU), Moscow',
+        edu_uni_courses: 'Core Coursework: Calculus, Linear Algebra, Mathematical Statistics, Algorithms & Data Structures, Microeconomics, Game Theory, Finance, Machine Learning.',
+        edu_school_title: 'Physics & Mathematics Lyceum #131, Kazan',
+        extra_edu_title: 'Additional Education',
+        extra_1_name: 'T-Generation',
+        extra_1_desc: 'Algorithms & Data Structures',
+        extra_2_name: 'Yandex Lyceum',
+        extra_2_desc: 'Industrial Python Programming',
+        extra_3_name: 'Olmat.Economics',
+        extra_3_desc: 'Olympiad Economics',
+        extra_4_name: 'Olmat.Business',
+        extra_4_desc: 'Business Analytics & Case Studies',
+        extra_5_desc: 'English Language (C1 Level)',
+        sec_ach_kicker: '// Honors & Community',
+        sec_ach_title: 'Achievements & Activities',
+        ach_scholarships_title: 'Scholarships & Olympiads',
+        ach_potanin: 'Vladimir Potanin Scholarship Laureate 2026',
+        ach_vsosh: 'Winner of the Regional Stage of All-Russian Olympiad in Economics (VsOSh)',
+        ach_econ_olymp: 'Prize-winner of Sibiriada, MOSH, Mission Possible, and Plekhanov Olympiads in Economics',
+        ach_math_olymp: 'Prize-winner of Mission Possible Olympiad in Mathematics',
+        ach_activities_title: 'Student Activities',
+        act_1: 'Member of Central University Math & Economics Olympiad Teams',
+        act_2: 'Twice named to Central University Dean’s List (Top Students)',
+        act_3: 'Freshmen Mentor at Central University',
+        footer_name: 'Denis Razin',
+        footer_sub: 'MIPT × Central University · Moscow',
+        details_btn: 'View Details',
+        cv_modal_title: 'Resume Preview (PDF)',
+        cv_print_btn: 'Save as PDF / Print',
+      },
+    };
+
+    // --------------------------------------------------------
+    // VERIFIED PROJECTS DATA (5 PROJECTS ONLY)
+    // --------------------------------------------------------
+    const projectsData = [
+      {
+        id: 'monte-carlo',
+        category: 'quant_ml',
+        categoryLabel: { ru: 'Quant & ML', en: 'Quant & ML' },
+        title: {
+          ru: 'Симуляции Монте-Карло и стресс-тест портфельного риска (VaR / ES)',
+          en: 'Monte Carlo Simulations & Portfolio Risk Stress-Testing (VaR / ES)',
+        },
+        badge: {
+          ru: '10 000 симуляций · 95% VaR -5.54% · 95% ES -7.39%',
+          en: '10,000 simulations · 95% VaR -5.54% · 95% ES -7.39%',
+        },
+        stack: ['Python', 'NumPy', 'Pandas', 'yfinance', 'Matplotlib', 'Seaborn'],
+        summary: {
+          ru: 'Моделирование месячной доходности (21 торговый день) равновесного портфеля из 5 акций (AAPL, MSFT, GOOGL, JPM, XOM) на данных 2024–2026 гг. с использованием разложения Холецкого и стресс-тестирования корреляций.',
+          en: 'Modeling 1-month returns (21 trading days) of an equal-weight 5-stock portfolio (AAPL, MSFT, GOOGL, JPM, XOM) on 2024–2026 data using Cholesky decomposition and correlation stress-testing.',
+        },
+        proofUrl: 'https://colab.research.google.com/drive/1qrGiToMq9ooiN94b7Ad4b5XQRo49YeL5?usp=sharing',
+        proofLabel: { ru: 'Открыть Google Colab', en: 'Open Google Colab' },
+        details: {
+          ru: `
+            <p class="text-gray-300 text-sm leading-relaxed">
+              Построена стохастическая модель оценки портфельного риска на основе 10 000 симуляций Монте-Карло с учётом матрицы корреляций через разложение Холецкого (горизонт 21 торговый день, равные веса по 20%).
+            </p>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs font-mono">
+              <div class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10"><div class="text-emerald-400 font-bold">AAPL</div><div class="text-gray-300">26.1% / 27.3%</div></div>
+              <div class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10"><div class="text-emerald-400 font-bold">MSFT</div><div class="text-gray-300">30.4% / 31.5%</div></div>
+              <div class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10"><div class="text-emerald-400 font-bold">GOOGL</div><div class="text-gray-300">28.9% / 23.5%</div></div>
+              <div class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10"><div class="text-emerald-400 font-bold">JPM</div><div class="text-gray-300">16.4% / 26.6%</div></div>
+              <div class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10"><div class="text-emerald-400 font-bold">XOM</div><div class="text-gray-300">27.4% / 23.4%</div></div>
+            </div>
+            <div class="text-xs text-gray-400 font-mono">Формат выше: Годовая доходность / Годовая волатильность</div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs font-mono border-collapse">
+                <thead>
+                  <tr class="border-b border-white/10 text-gray-400 text-left">
+                    <th class="py-2 pr-3">Средняя корреляция</th>
+                    <th class="py-2 pr-3">95% VaR</th>
+                    <th class="py-2">Рост риска</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5 text-gray-200">
+                  <tr><td class="py-2 pr-3">0.19 (базовая)</td><td class="py-2 pr-3 text-emerald-400">-5.54%</td><td class="py-2">+0.0%</td></tr>
+                  <tr><td class="py-2 pr-3">0.44</td><td class="py-2 pr-3 text-amber-300">-7.29%</td><td class="py-2">+31.7%</td></tr>
+                  <tr><td class="py-2 pr-3">0.68</td><td class="py-2 pr-3 text-orange-400">-8.75%</td><td class="py-2">+58.0%</td></tr>
+                  <tr><td class="py-2 pr-3">0.92 (кризис)</td><td class="py-2 pr-3 text-rose-400">-10.03%</td><td class="py-2 text-rose-400 font-bold">+81.2%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs font-mono text-emerald-300">
+              Базовый 95% Expected Shortfall (ES): -7.39% (средний убыток в худших 5% сценариев)
+            </div>
+          `,
+          en: `
+            <p class="text-gray-300 text-sm leading-relaxed">
+              Built a stochastic portfolio risk engine running 10,000 Monte Carlo simulations with Cholesky-correlated asset returns (21-day horizon, 20% equal weights across 5 equities).
+            </p>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs font-mono">
+              <div class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10"><div class="text-emerald-400 font-bold">AAPL</div><div class="text-gray-300">26.1% / 27.3%</div></div>
+              <div class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10"><div class="text-emerald-400 font-bold">MSFT</div><div class="text-gray-300">30.4% / 31.5%</div></div>
+              <div class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10"><div class="text-emerald-400 font-bold">GOOGL</div><div class="text-gray-300">28.9% / 23.5%</div></div>
+              <div class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10"><div class="text-emerald-400 font-bold">JPM</div><div class="text-gray-300">16.4% / 26.6%</div></div>
+              <div class="p-2.5 rounded-lg bg-white/[0.03] border border-white/10"><div class="text-emerald-400 font-bold">XOM</div><div class="text-gray-300">27.4% / 23.4%</div></div>
+            </div>
+            <div class="text-xs text-gray-400 font-mono">Format above: Annual Return / Annual Volatility</div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs font-mono border-collapse">
+                <thead>
+                  <tr class="border-b border-white/10 text-gray-400 text-left">
+                    <th class="py-2 pr-3">Avg. Correlation</th>
+                    <th class="py-2 pr-3">95% VaR</th>
+                    <th class="py-2">Risk Increase</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5 text-gray-200">
+                  <tr><td class="py-2 pr-3">0.19 (Base)</td><td class="py-2 pr-3 text-emerald-400">-5.54%</td><td class="py-2">+0.0%</td></tr>
+                  <tr><td class="py-2 pr-3">0.44</td><td class="py-2 pr-3 text-amber-300">-7.29%</td><td class="py-2">+31.7%</td></tr>
+                  <tr><td class="py-2 pr-3">0.68</td><td class="py-2 pr-3 text-orange-400">-8.75%</td><td class="py-2">+58.0%</td></tr>
+                  <tr><td class="py-2 pr-3">0.92 (Stress)</td><td class="py-2 pr-3 text-rose-400">-10.03%</td><td class="py-2 text-rose-400 font-bold">+81.2%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs font-mono text-emerald-300">
+              Base 95% Expected Shortfall (ES): -7.39% (mean loss in worst 5% scenarios)
+            </div>
+          `,
+        },
+      },
+      {
+        id: 'burdenko-ml',
+        category: 'quant_ml',
+        categoryLabel: { ru: 'Quant & ML', en: 'Quant & ML' },
+        title: {
+          ru: 'Прогнозирование интракраниальной прогрессии (НМИЦ им. Бурденко)',
+          en: 'Intracranial Progression Prediction (Burdenko Neurosurgery Center)',
+        },
+        badge: {
+          ru: 'ROC-AUC 0.802 · PR-AUC 0.903 · Bal. Acc 0.760',
+          en: 'ROC-AUC 0.802 · PR-AUC 0.903 · Bal. Acc 0.760',
+        },
+        stack: ['Python', 'CatBoost', 'XGBoost', 'Random Forest', 'Scikit-Learn', 'SHAP', 'LIME'],
+        summary: {
+          ru: 'Первый автор и автор-корреспондент научной статьи. Пайплайн прогнозирования прогрессии метастазов головного мозга после радиохирургии «Гамма-нож» на данных 680 пациентов.',
+          en: 'First & corresponding author of the research paper. End-to-end ML pipeline predicting brain metastases progression after Gamma Knife radiosurgery on 680 clinical patients.',
+        },
+        proofUrl: 'https://github.com/d-inozemtsev/progression-prediction-gamma-knife',
+        proofLabel: { ru: 'Открыть код на GitHub', en: 'Open Code on GitHub' },
+        details: {
+          ru: `
+            <ul class="space-y-2 text-sm text-gray-300 leading-relaxed">
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Выборка и Feature Engineering:</strong> 680 анонимизированных пациентов, расширение с 18 исходных до 26 признаков (логарифмы объёмов, индексы агрессивности роста и скорости метастазирования, взаимодействия с индексом Карновского).</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Валидация:</strong> 5-fold Stratified Cross-Validation по 6 базовым алгоритмам (Random Forest, CatBoost, XGBoost, LightGBM, Logistic Regression, MLP).</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Финальный ранговый ансамбль (Rank Averaging):</strong> RF (0.40) + CatBoost (0.35) + XGBoost (0.25) при пороге 0.48.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Интерпретируемость (XAI):</strong> глобальный анализ факторов риска через SHAP и локальный разбор клинических кейсов через LIME.</li>
+            </ul>
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center font-mono text-xs pt-1">
+              <div class="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20"><div class="text-gray-400 text-[10px]">ROC-AUC</div><div class="text-emerald-300 font-bold">0.802</div></div>
+              <div class="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20"><div class="text-gray-400 text-[10px]">PR-AUC</div><div class="text-cyan-300 font-bold">0.903</div></div>
+              <div class="p-2 rounded-lg bg-white/5 border border-white/10"><div class="text-gray-400 text-[10px]">Bal. Acc</div><div class="text-white font-bold">0.760</div></div>
+              <div class="p-2 rounded-lg bg-white/5 border border-white/10"><div class="text-gray-400 text-[10px]">Recall</div><div class="text-white font-bold">0.670</div></div>
+              <div class="p-2 rounded-lg bg-white/5 border border-white/10"><div class="text-gray-400 text-[10px]">Precision</div><div class="text-white font-bold">0.895</div></div>
+              <div class="p-2 rounded-lg bg-white/5 border border-white/10"><div class="text-gray-400 text-[10px]">F2</div><div class="text-white font-bold">0.705</div></div>
+            </div>
+          `,
+          en: `
+            <ul class="space-y-2 text-sm text-gray-300 leading-relaxed">
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Dataset &amp; Feature Engineering:</strong> 680 anonymized patients, expanded from 18 raw to 26 engineered features (log tumor volumes, growth aggressiveness &amp; metastasis velocity indices, Karnofsky interaction terms).</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Validation:</strong> 5-fold Stratified CV benchmark across 6 models (Random Forest, CatBoost, XGBoost, LightGBM, Logistic Regression, MLP).</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Final Rank Ensemble:</strong> Rank Averaging of RF (0.40) + CatBoost (0.35) + XGBoost (0.25) at threshold 0.48.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Explainability (XAI):</strong> Global feature attribution via SHAP and patient-level local explanations via LIME.</li>
+            </ul>
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center font-mono text-xs pt-1">
+              <div class="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20"><div class="text-gray-400 text-[10px]">ROC-AUC</div><div class="text-emerald-300 font-bold">0.802</div></div>
+              <div class="p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20"><div class="text-gray-400 text-[10px]">PR-AUC</div><div class="text-cyan-300 font-bold">0.903</div></div>
+              <div class="p-2 rounded-lg bg-white/5 border border-white/10"><div class="text-gray-400 text-[10px]">Bal. Acc</div><div class="text-white font-bold">0.760</div></div>
+              <div class="p-2 rounded-lg bg-white/5 border border-white/10"><div class="text-gray-400 text-[10px]">Recall</div><div class="text-white font-bold">0.670</div></div>
+              <div class="p-2 rounded-lg bg-white/5 border border-white/10"><div class="text-gray-400 text-[10px]">Precision</div><div class="text-white font-bold">0.895</div></div>
+              <div class="p-2 rounded-lg bg-white/5 border border-white/10"><div class="text-gray-400 text-[10px]">F2</div><div class="text-white font-bold">0.705</div></div>
+            </div>
+          `,
+        },
+      },
+      {
+        id: 'aeroflot-irc',
+        category: 'finance',
+        categoryLabel: { ru: 'Finance', en: 'Finance' },
+        title: {
+          ru: 'Инвестиционный отчёт по ПАО «Аэрофлот» (NES IRC)',
+          en: 'Aeroflot (AFLT) Equity Research Report (NES IRC)',
+        },
+        badge: {
+          ru: 'BUY · Target Price 70.7 ₽ (+24%) · EV/EBITDA 3.0x',
+          en: 'BUY · Target Price 70.7 RUB (+24%) · EV/EBITDA 3.0x',
+        },
+        stack: ['Financial Modeling', 'DCF', 'Multiples Valuation', 'Equity Research'],
+        summary: {
+          ru: 'Командный инвестиционный отчёт (one-pager на английском) и защита рекомендации BUY по акциям Аэрофлота (AFLT MOEX) на конкурсе NES IRC (выход в предпоследний этап на 1 курсе).',
+          en: 'Team equity research one-pager in English and BUY pitch on Aeroflot (AFLT MOEX) for NES Investment Research Challenge (reached semifinal stage as a freshman).',
+        },
+        proofUrl: null,
+        proofLabel: null,
+        details: {
+          ru: `
+            <ul class="space-y-2 text-sm text-gray-300 leading-relaxed">
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Оценка и рекомендация:</strong> BUY, целевая цена 70.7 ₽ (+24% апсайд к цене закрытия 57.26 ₽ на 31.01.2026). Коридор справедливой стоимости: 68–75 ₽.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Сценарии DCF:</strong> Bear 62.11 ₽ / Base 70.70 ₽ / Bull 98.34 ₽.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Мультипликаторы:</strong> торгуется по 3.0x EV/EBITDA — дисконт 27% к медиане EM-аналогов (4.1x).</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Операционные и финпоказатели:</strong> выручка 2024 — 856.8 млрд ₽, чистая прибыль — 55.0 млрд ₽, 55.3 млн пассажиров в 2025, загрузка кресел 89–90%.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Катализаторы:</strong> отчётность МСФО, начало поставок МС-21, цикл снижения ключевой ставки ЦБ.</li>
+            </ul>
+          `,
+          en: `
+            <ul class="space-y-2 text-sm text-gray-300 leading-relaxed">
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Valuation &amp; Call:</strong> BUY, 12M Target Price RUB 70.7 (+24% upside vs. RUB 57.26 close as of Jan 31, 2026). Fair value corridor: RUB 68–75.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">DCF Scenarios:</strong> Bear RUB 62.11 / Base RUB 70.70 / Bull RUB 98.34.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Multiples:</strong> Trading at 3.0x EV/EBITDA — a 27% discount to EM airline peer median (4.1x).</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Financials &amp; KPIs:</strong> FY2024 revenue RUB 856.8bn, net income RUB 55.0bn, 55.3M passengers in 2025, 89–90% load factor.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Catalysts:</strong> IFRS reporting, initial MC-21 deliveries, and CBR rate-cutting cycle.</li>
+            </ul>
+          `,
+        },
+      },
+      {
+        id: 'sibur-valuation',
+        category: 'finance',
+        categoryLabel: { ru: 'Finance', en: 'Finance' },
+        title: {
+          ru: 'Оценка инвестпроекта «Нижнекамск Полиэтилен» (СИБУР)',
+          en: 'Investment Project Valuation: Nizhnekamsk Polyethylene (SIBUR)',
+        },
+        badge: {
+          ru: 'Мощность 300 тыс. т/год · CAPEX ~33 млрд ₽ · OPEX ~12.8 млрд ₽',
+          en: 'Capacity 300 kt/yr · CAPEX ~33 bn RUB · OPEX ~12.8 bn RUB',
+        },
+        stack: ['Financial Modeling', 'CAPEX/OPEX', 'FCF', 'Scenario Analysis'],
+        summary: {
+          ru: 'Построение с нуля финансовой модели строительства нового завода мЛПЭНП (металлоценового полиэтилена) СИБУРа в Татарстане и защита перед представителями компании.',
+          en: 'Built a from-scratch financial model for SIBUR’s new mLLDPE plant in Tatarstan and defended the investment valuation before SIBUR representatives.',
+        },
+        proofUrl: null,
+        proofLabel: null,
+        details: {
+          ru: `
+            <ul class="space-y-2 text-sm text-gray-300 leading-relaxed">
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Параметры завода:</strong> мощность 300 тыс. т/год мЛПЭНП (потребность рынка РФ — 170 тыс. т/год), завершение строительства — 2028 г.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Сценарии цены:</strong> базовый 1250 $/т, позитивный 1400 $/т, негативный 1000 $/т.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Выручка и затраты:</strong> выручка растёт с 39 970 млн ₽ (2030) до 56 356 млн ₽ (2034). CAPEX ~33 млрд ₽ (основные вложения 2026–2029), OPEX ~12.8 млрд ₽/год.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Свободный денежный поток (FCF):</strong> выходит в плюс в 2030 (+15 406 млн ₽) и достигает +24 547 млн ₽ в 2034.</li>
+            </ul>
+          `,
+          en: `
+            <ul class="space-y-2 text-sm text-gray-300 leading-relaxed">
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Plant Specs:</strong> 300 kt/year mLLDPE capacity (Russian market demand 170 kt/year), construction completion in 2028.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Price Scenarios:</strong> Base $1,250/t, Bull $1,400/t, Bear $1,000/t.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Revenue &amp; Costs:</strong> Revenue grows from RUB 39,970M (2030) to RUB 56,356M (2034). CAPEX ~RUB 33bn (2026–2029), OPEX ~RUB 12.8bn/year.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Free Cash Flow (FCF):</strong> Turns positive in 2030 (+RUB 15,406M) and reaches +RUB 24,547M by 2034.</li>
+            </ul>
+          `,
+        },
+      },
+      {
+        id: 'dano-analytics',
+        category: 'analytics',
+        categoryLabel: { ru: 'Data Analytics', en: 'Data Analytics' },
+        title: {
+          ru: 'Анализ разрыва зарплат: частный vs госсектор (DANO)',
+          en: 'Wage Gap Analysis: Private vs. Public Sector (DANO)',
+        },
+        badge: {
+          ru: '3 871 наблюдение · 38 регионов · p < 0.01 (кластеры 3–4)',
+          en: '3,871 observations · 38 regions · p < 0.01 (clusters 3–4)',
+        },
+        stack: ['Python', 'Pandas', 'EDA', 'Hypothesis Testing', 'Regression'],
+        summary: {
+          ru: 'Роль экономиста в команде DataSad. Исследование влияния сектора занятости (частный/государственный) на уровень заработной платы с очисткой выбросов, кластеризацией регионов и проверкой статистических гипотез.',
+          en: 'Economist role in team DataSad. Empirical study of private vs. public sector wage differentials with outlier removal, regional clustering, and hypothesis testing.',
+        },
+        proofUrl: null,
+        proofLabel: null,
+        details: {
+          ru: `
+            <ul class="space-y-2 text-sm text-gray-300 leading-relaxed">
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Данные:</strong> выборка за 2016 год — 3 871 наблюдение, 38 регионов РФ, 4 уровня образования.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Методология:</strong> кластеризация регионов на 4 группы по уровню зарплат, очистка выбросов, построение регрессий по возрасту и уровню образования.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Результаты проверки гипотез:</strong> статистически значимое преимущество частного сектора подтверждено в большинстве групп — в 4-й группе регионов p = 0.00151 (среднее/ПТУ) и p = 0.00131 (высшее образование); в 3-й группе — p = 0.00672 и p = 0.00407 соответственно.</li>
+            </ul>
+          `,
+          en: `
+            <ul class="space-y-2 text-sm text-gray-300 leading-relaxed">
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Dataset:</strong> 2016 Russian labor dataset — 3,871 rows, 38 regions, 4 education levels.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Methodology:</strong> Grouped regions into 4 wage clusters, removed outliers, and fitted age/education wage regressions.</li>
+              <li><span class="text-emerald-400 font-mono">▹</span> <strong class="text-white">Hypothesis Testing:</strong> Confirmed statistically significant private-sector wage premium in most clusters — Cluster 4: p = 0.00151 (secondary/vocational) and p = 0.00131 (higher ed); Cluster 3: p = 0.00672 and p = 0.00407.</li>
+            </ul>
+          `,
+        },
+      },
+    ];
+
+    // --------------------------------------------------------
+    // INTERACTIVE CHART.JS TERMINAL (3 VERIFIED TABS)
+    // --------------------------------------------------------
+    function renderTerminalChart() {
+      const ctx = document.getElementById('terminalChart').getContext('2d');
+      if (terminalChartInstance) {
+        terminalChartInstance.destroy();
+      }
+
+      const titleEl = document.getElementById('term-title');
+      const subEl = document.getElementById('term-subtitle');
+      const badgesEl = document.getElementById('term-badges');
+
+      const commonGrid = { color: 'rgba(255, 255, 255, 0.06)' };
+      const commonTicks = { color: '#9ca3af', font: { family: 'JetBrains Mono', size: 11 } };
+
+      if (currentTab === 'mc') {
+        titleEl.textContent = currentLang === 'ru'
+          ? 'Стресс-тест 95% VaR при росте корреляций'
+          : '95% VaR Stress-Test Across Correlation Regimes';
+        subEl.textContent = currentLang === 'ru'
+          ? '10 000 симуляций Монте-Карло · Разложение Холецкого · Горизонт 21 день'
+          : '10,000 Monte Carlo Simulations · Cholesky Decomposition · 21-Day Horizon';
+        badgesEl.innerHTML = `
+          <span class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Base ES: -7.39%</span>
+          <span class="px-2 py-1 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20">Max Stress: +81.2%</span>
+        `;
+
+        terminalChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Corr 0.19', 'Corr 0.44', 'Corr 0.68', 'Corr 0.92'],
+            datasets: [
+              {
+                label: currentLang === 'ru' ? '95% VaR (%)' : '95% VaR (%)',
+                data: [-5.54, -7.29, -8.75, -10.03],
+                backgroundColor: [
+                  'rgba(16, 185, 129, 0.75)',
+                  'rgba(245, 158, 11, 0.75)',
+                  'rgba(249, 115, 22, 0.8)',
+                  'rgba(244, 63, 94, 0.85)',
+                ],
+                borderColor: ['#10b981', '#f59e0b', '#f97316', '#f43f5e'],
+                borderWidth: 1.5,
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#111622',
+                borderColor: 'rgba(255,255,255,0.12)',
+                borderWidth: 1,
+                titleFont: { family: 'JetBrains Mono' },
+                bodyFont: { family: 'JetBrains Mono' },
+                callbacks: {
+                  afterLabel: (context) => {
+                    const inc = ['+0.0%', '+31.7%', '+58.0%', '+81.2%'][context.dataIndex];
+                    return (currentLang === 'ru' ? 'Рост риска: ' : 'Risk Increase: ') + inc;
+                  },
+                },
+              },
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: commonTicks },
+              y: {
+                grid: commonGrid,
+                ticks: { ...commonTicks, callback: (v) => v + '%' },
+                suggestedMin: -11,
+                suggestedMax: 0,
+              },
+            },
+          },
+        });
+      } else if (currentTab === 'ml') {
+        titleEl.textContent = currentLang === 'ru'
+          ? 'НМИЦ им. Бурденко: сравнение моделей (5-Fold CV)'
+          : 'Burdenko Clinical ML: 5-Fold CV Comparison';
+        subEl.textContent = currentLang === 'ru'
+          ? '680 пациентов · 26 признаков · Ранговый ансамбль (RF + CatBoost + XGBoost)'
+          : '680 patients · 26 features · Rank Ensemble (RF + CatBoost + XGBoost)';
+        badgesEl.innerHTML = `
+          <span class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">ROC-AUC: 0.802</span>
+          <span class="px-2 py-1 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">PR-AUC: 0.903</span>
+        `;
+
+        terminalChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Rank Ens.', 'Rand. Forest', 'CatBoost', 'XGBoost', 'LightGBM', 'LogReg'],
+            datasets: [
+              {
+                label: 'ROC-AUC',
+                data: [0.802, 0.800, 0.792, 0.777, 0.770, 0.802],
+                backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                borderRadius: 4,
+              },
+              {
+                label: 'PR-AUC',
+                data: [0.903, 0.902, 0.901, 0.888, 0.883, 0.900],
+                backgroundColor: 'rgba(6, 182, 212, 0.8)',
+                borderRadius: 4,
+              },
+              {
+                label: 'Bal. Acc',
+                data: [0.760, 0.763, 0.756, 0.711, 0.708, 0.747],
+                backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                borderRadius: 4,
+              },
+              {
+                label: 'Recall',
+                data: [0.670, 0.598, 0.631, 0.703, 0.654, 0.553],
+                backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { color: '#d1d5db', boxWidth: 10, font: { family: 'JetBrains Mono', size: 10 } },
+              },
+              tooltip: {
+                backgroundColor: '#111622',
+                borderColor: 'rgba(255,255,255,0.12)',
+                borderWidth: 1,
+                bodyFont: { family: 'JetBrains Mono' },
+              },
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: commonTicks },
+              y: {
+                grid: commonGrid,
+                ticks: commonTicks,
+                min: 0.5,
+                max: 0.95,
+              },
+            },
+          },
+        });
+      } else if (currentTab === 'sibur') {
+        titleEl.textContent = currentLang === 'ru'
+          ? 'СИБУР «Нижнекамск Полиэтилен»: Free Cash Flow (2026–2034)'
+          : 'SIBUR Nizhnekamsk Plant: Free Cash Flow (2026–2034)';
+        subEl.textContent = currentLang === 'ru'
+          ? 'Прогноз свободного денежного потока (млн ₽) · CAPEX ~33 млрд ₽'
+          : 'Projected Free Cash Flow (RUB mln) · CAPEX ~RUB 33bn';
+        badgesEl.innerHTML = `
+          <span class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">2034 FCF: +24 547M ₽</span>
+        `;
+
+        const fcfValues = [-7842, -13663, -9840, -1704, 15406, 18447, 20267, 22395, 24547];
+        terminalChartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['2026', '2027', '2028', '2029', '2030', '2031', '2032', '2033', '2034'],
+            datasets: [
+              {
+                label: currentLang === 'ru' ? 'FCF (млн ₽)' : 'FCF (RUB mln)',
+                data: fcfValues,
+                backgroundColor: fcfValues.map((v) =>
+                  v < 0 ? 'rgba(244, 63, 94, 0.78)' : 'rgba(16, 185, 129, 0.8)'
+                ),
+                borderColor: fcfValues.map((v) => (v < 0 ? '#f43f5e' : '#10b981')),
+                borderWidth: 1.5,
+                borderRadius: 5,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#111622',
+                borderColor: 'rgba(255,255,255,0.12)',
+                borderWidth: 1,
+                bodyFont: { family: 'JetBrains Mono' },
+                callbacks: {
+                  label: (c) => `FCF: ${c.raw > 0 ? '+' : ''}${c.raw.toLocaleString('ru-RU')} ${currentLang === 'ru' ? 'млн ₽' : 'RUB mln'}`,
+                },
+              },
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: commonTicks },
+              y: {
+                grid: commonGrid,
+                ticks: { ...commonTicks, callback: (v) => (v / 1000) + 'k' },
+              },
+            },
+          },
+        });
+      }
+    }
+
+    function switchTerminalTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.term-tab').forEach((btn) => {
+        btn.classList.remove('bg-emerald-500/15', 'text-emerald-300', 'border-emerald-500/30');
+        btn.classList.add('text-gray-400', 'border-transparent');
+      });
+      const activeBtn = document.getElementById('tab-' + tab);
+      activeBtn.classList.add('bg-emerald-500/15', 'text-emerald-300', 'border-emerald-500/30');
+      activeBtn.classList.remove('text-gray-400', 'border-transparent');
+      renderTerminalChart();
+    }
+
+    // --------------------------------------------------------
+    // PROJECTS RENDER & FILTERING
+    // --------------------------------------------------------
+    function renderProjects() {
+      const grid = document.getElementById('projects-grid');
+      const filtered = currentFilter === 'all'
+        ? projectsData
+        : projectsData.filter((p) => p.category === currentFilter);
+
+      grid.innerHTML = filtered
+        .map(
+          (p) => `
+          <article
+            onclick="openProjectModal('${p.id}')"
+            class="card-surface card-surface-hover rounded-2xl p-6 flex flex-col justify-between gap-5 cursor-pointer group"
+          >
+            <div class="space-y-3.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-mono text-[11px] px-2.5 py-0.5 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                  ${p.categoryLabel[currentLang]}
+                </span>
+                <span class="text-xs font-mono text-gray-500 group-hover:text-emerald-400 transition">
+                  ${i18n[currentLang].details_btn} →
+                </span>
+              </div>
+
+              <h3 class="text-base sm:text-lg font-bold text-white group-hover:text-emerald-300 transition leading-snug">
+                ${p.title[currentLang]}
+              </h3>
+
+              <div class="font-mono text-[11px] px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 leading-relaxed">
+                ${p.badge[currentLang]}
+              </div>
+
+              <p class="text-xs sm:text-sm text-gray-400 leading-relaxed">
+                ${p.summary[currentLang]}
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-1.5 pt-2 border-t border-white/5">
+              ${p.stack
+                .map(
+                  (tech) =>
+                    `<span class="px-2 py-0.5 rounded bg-white/[0.04] border border-white/10 text-[11px] font-mono text-gray-300">${tech}</span>`
+                )
+                .join('')}
+            </div>
+          </article>
+        `
+        )
+        .join('');
+    }
+
+    function filterProjects(category) {
+      currentFilter = category;
+      document.querySelectorAll('.filter-btn').forEach((btn) => {
+        if (btn.dataset.filter === category) {
+          btn.className = 'filter-btn px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium bg-emerald-500 text-gray-950 transition';
+        } else {
+          btn.className = 'filter-btn px-3.5 py-1.5 rounded-xl text-xs font-mono font-medium bg-white/5 text-gray-300 hover:bg-white/10 border border-white/10 transition';
+        }
+      });
+      renderProjects();
+    }
+
+    // --------------------------------------------------------
+    // PROJECT MODAL
+    // --------------------------------------------------------
+    function openProjectModal(projectId) {
+      const p = projectsData.find((item) => item.id === projectId);
+      if (!p) return;
+
+      const body = document.getElementById('modal-body');
+      body.innerHTML = `
+        <div class="space-y-2 pr-8">
+          <span class="font-mono text-xs px-2.5 py-0.5 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+            ${p.categoryLabel[currentLang]}
+          </span>
+          <h3 class="text-xl sm:text-2xl font-bold text-white leading-snug">${p.title[currentLang]}</h3>
+          <div class="font-mono text-xs text-emerald-300">${p.badge[currentLang]}</div>
+        </div>
+
+        <div class="space-y-4">
+          ${p.details[currentLang]}
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-white/10">
+          <div class="flex flex-wrap gap-1.5">
+            ${p.stack
+              .map(
+                (t) =>
+                  `<span class="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[11px] font-mono text-gray-300">${t}</span>`
+              )
+              .join('')}
+          </div>
+          ${
+            p.proofUrl
+              ? `<a href="${p.proofUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-semibold text-xs sm:text-sm transition shrink-0">
+                  <span>${p.proofLabel[currentLang]}</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>`
+              : ''
+          }
+        </div>
+      `;
+
+      const modal = document.getElementById('project-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeProjectModal(e) {
+      if (e && e.target !== document.getElementById('project-modal')) return;
+      const modal = document.getElementById('project-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    // --------------------------------------------------------
+    // PRINT-READY CV MODAL
+    // --------------------------------------------------------
+    function renderCvContent() {
+      const area = document.getElementById('cv-print-area');
+      if (currentLang === 'ru') {
+        area.innerHTML = `
+          <div class="border-b-2 border-gray-900 pb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+            <div>
+              <h1 class="text-2xl font-extrabold text-gray-900">Разин Денис</h1>
+              <p class="text-gray-700 font-medium">Студент совместного бакалавриата МФТИ (ФПМИ) и Центрального университета</p>
+            </div>
+            <div class="text-xs font-mono text-gray-700 sm:text-right space-y-0.5">
+              <div>denis.razin.2007@gmail.com</div>
+              <div>Telegram: @dionis_29 · Москва</div>
+            </div>
+          </div>
+
+          <section>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 pb-1 mb-2">Образование</h2>
+            <div class="space-y-2 text-xs sm:text-sm">
+              <div class="flex justify-between gap-2 font-semibold">
+                <span>МФТИ и Центральный университет (ФПМИ / Математика и компьютерные науки)</span>
+                <span class="font-mono shrink-0">2025 – 2029</span>
+              </div>
+              <div class="text-gray-700">Студент 2 курса · <strong>GPA: 8.43</strong>. Дисциплины: Математический анализ, Линейная алгебра, Математическая статистика, АиСД, Микроэкономика, Теория игр, Финансы, Машинное обучение.</div>
+              <div class="flex justify-between gap-2 font-medium text-gray-800">
+                <span>Физико-математический лицей №131, г. Казань</span>
+                <span class="font-mono shrink-0">2020 – 2025</span>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 pb-1 mb-2">Проекты и исследования</h2>
+            <div class="space-y-2.5 text-xs sm:text-sm">
+              <div>
+                <div class="font-semibold">Симуляции Монте-Карло и стресс-тест портфельного риска (VaR / ES)</div>
+                <div class="text-gray-700">10 000 симуляций с разложением Холецкого (AAPL, MSFT, GOOGL, JPM, XOM). Базовый 95% VaR: -5.54%, 95% ES: -7.39%; при стрессе корреляций до 0.92 риск растёт на +81.2% (до -10.03%).</div>
+              </div>
+              <div>
+                <div class="font-semibold">Прогнозирование интракраниальной прогрессии (НМИЦ им. Бурденко)</div>
+                <div class="text-gray-700">Первый автор статьи. 680 пациентов, 26 признаков. Ранговый ансамбль (RF + CatBoost + XGBoost): ROC-AUC 0.802, PR-AUC 0.903, Balanced Accuracy 0.760, Recall 0.670. Интерпретация через SHAP и LIME.</div>
+              </div>
+              <div>
+                <div class="font-semibold">Инвестиционный отчёт по ПАО «Аэрофлот» (NES IRC)</div>
+                <div class="text-gray-700">Рекомендация BUY, целевая цена 70.7 ₽ (+24% апсайд к 57.26 ₽), сценарии DCF: 62.11 / 70.70 / 98.34 ₽. Выход в предпоследний этап на 1 курсе.</div>
+              </div>
+              <div>
+                <div class="font-semibold">Оценка инвестпроекта «Нижнекамск Полиэтилен» (СИБУР)</div>
+                <div class="text-gray-700">Финансовая модель завода мЛПЭНП (300 тыс. т/год): CAPEX ~33 млрд ₽, OPEX ~12.8 млрд ₽/год, выход FCF в плюс в 2030 (+15 406 млн ₽) и рост до +24 547 млн ₽ в 2034.</div>
+              </div>
+              <div>
+                <div class="font-semibold">Анализ разрыва зарплат: частный vs госсектор (DANO)</div>
+                <div class="text-gray-700">3 871 наблюдение, 38 регионов. Кластеризация регионов, регрессии и проверка гипотез (p &lt; 0.01 в кластерах 3–4).</div>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 pb-1 mb-2">Навыки</h2>
+            <div class="text-xs sm:text-sm text-gray-800 space-y-1">
+              <div><strong>Programming:</strong> Python, C++</div>
+              <div><strong>ML &amp; Data:</strong> Scikit-Learn, CatBoost, XGBoost, LightGBM, Feature Engineering, Model Validation, Hyperparameter Tuning, SHAP, NumPy, Pandas, Matplotlib</div>
+              <div><strong>Algorithms:</strong> Dynamic Programming, Graph Algorithms, Computational Geometry, Binary Search</div>
+              <div><strong>Finance &amp; Economics:</strong> Financial Modeling, Equity Research, DCF &amp; Valuation, Fundamental Analysis, Microeconomics, Game Theory</div>
+              <div><strong>Languages:</strong> English (C1 / Fluent)</div>
+            </div>
+          </section>
+
+          <section>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 pb-1 mb-2">Достижения и активности</h2>
+            <ul class="list-disc pl-5 text-xs sm:text-sm text-gray-800 space-y-1">
+              <li>Лауреат именной стипендии Владимира Потанина 2026</li>
+              <li>Победитель регионального этапа ВсОШ по экономике; призёр олимпиад «Сибириада», «МОШ», «Миссия выполнима», «Плехановская» по экономике и «Миссия выполнима» по математике</li>
+              <li>Член сборных ЦУ по математике и экономике; дважды в списке лучших студентов ЦУ; куратор первокурсников</li>
+            </ul>
+          </section>
+        `;
+      } else {
+        area.innerHTML = `
+          <div class="border-b-2 border-gray-900 pb-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+            <div>
+              <h1 class="text-2xl font-extrabold text-gray-900">Denis Razin</h1>
+              <p class="text-gray-700 font-medium">Joint B.Sc. Student at MIPT (FPMI) &amp; Central University</p>
+            </div>
+            <div class="text-xs font-mono text-gray-700 sm:text-right space-y-0.5">
+              <div>denis.razin.2007@gmail.com</div>
+              <div>Telegram: @dionis_29 · Moscow</div>
+            </div>
+          </div>
+
+          <section>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 pb-1 mb-2">Education</h2>
+            <div class="space-y-2 text-xs sm:text-sm">
+              <div class="flex justify-between gap-2 font-semibold">
+                <span>MIPT &amp; Central University (Applied Mathematics &amp; Computer Science)</span>
+                <span class="font-mono shrink-0">2025 – 2029</span>
+              </div>
+              <div class="text-gray-700">2nd-Year Student · <strong>GPA: 8.43</strong>. Coursework: Calculus, Linear Algebra, Mathematical Statistics, Algorithms &amp; Data Structures, Microeconomics, Game Theory, Finance, Machine Learning.</div>
+              <div class="flex justify-between gap-2 font-medium text-gray-800">
+                <span>Physics &amp; Mathematics Lyceum #131, Kazan</span>
+                <span class="font-mono shrink-0">2020 – 2025</span>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 pb-1 mb-2">Projects &amp; Research</h2>
+            <div class="space-y-2.5 text-xs sm:text-sm">
+              <div>
+                <div class="font-semibold">Monte Carlo Simulations &amp; Portfolio Risk Stress-Testing (VaR / ES)</div>
+                <div class="text-gray-700">10,000 Cholesky-correlated simulations (AAPL, MSFT, GOOGL, JPM, XOM). Base 95% VaR: -5.54%, 95% ES: -7.39%; under 0.92 correlation stress, VaR increases +81.2% to -10.03%.</div>
+              </div>
+              <div>
+                <div class="font-semibold">Intracranial Progression Prediction (Burdenko Neurosurgery Center)</div>
+                <div class="text-gray-700">First &amp; corresponding author. 680 patients, 26 features. Rank Ensemble (RF + CatBoost + XGBoost): ROC-AUC 0.802, PR-AUC 0.903, Balanced Accuracy 0.760, Recall 0.670. XAI via SHAP &amp; LIME.</div>
+              </div>
+              <div>
+                <div class="font-semibold">Aeroflot (AFLT) Equity Research Report (NES IRC)</div>
+                <div class="text-gray-700">BUY recommendation, Target Price RUB 70.7 (+24% upside vs. RUB 57.26), DCF scenarios: RUB 62.11 / 70.70 / 98.34. Reached semifinal stage as a freshman.</div>
+              </div>
+              <div>
+                <div class="font-semibold">Investment Project Valuation: Nizhnekamsk Polyethylene (SIBUR)</div>
+                <div class="text-gray-700">Financial model for 300 kt/yr mLLDPE plant: CAPEX ~RUB 33bn, OPEX ~RUB 12.8bn/yr, FCF turns positive in 2030 (+RUB 15,406M) reaching +RUB 24,547M in 2034.</div>
+              </div>
+              <div>
+                <div class="font-semibold">Wage Gap Analysis: Private vs. Public Sector (DANO)</div>
+                <div class="text-gray-700">3,871 observations across 38 regions. Regional clustering, regressions, and hypothesis testing (p &lt; 0.01 in clusters 3–4).</div>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 pb-1 mb-2">Skills</h2>
+            <div class="text-xs sm:text-sm text-gray-800 space-y-1">
+              <div><strong>Programming:</strong> Python, C++</div>
+              <div><strong>ML &amp; Data:</strong> Scikit-Learn, CatBoost, XGBoost, LightGBM, Feature Engineering, Model Validation, Hyperparameter Tuning, SHAP, NumPy, Pandas, Matplotlib</div>
+              <div><strong>Algorithms:</strong> Dynamic Programming, Graph Algorithms, Computational Geometry, Binary Search</div>
+              <div><strong>Finance &amp; Economics:</strong> Financial Modeling, Equity Research, DCF &amp; Valuation, Fundamental Analysis, Microeconomics, Game Theory</div>
+              <div><strong>Languages:</strong> English (C1 / Fluent)</div>
+            </div>
+          </section>
+
+          <section>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500 border-b border-gray-200 pb-1 mb-2">Achievements &amp; Activities</h2>
+            <ul class="list-disc pl-5 text-xs sm:text-sm text-gray-800 space-y-1">
+              <li>Vladimir Potanin Scholarship Laureate 2026</li>
+              <li>Winner of Regional Stage of All-Russian Olympiad in Economics; Prize-winner of Sibiriada, MOSH, Mission Possible, and Plekhanov Olympiads</li>
+              <li>Member of CU Math &amp; Economics Olympiad Teams; Twice on CU Dean’s List; Freshmen Mentor</li>
+            </ul>
+          </section>
+        `;
+      }
+    }
+
+    function openCvModal() {
+      renderCvContent();
+      const modal = document.getElementById('cv-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCvModal(e) {
+      if (e && e.target !== document.getElementById('cv-modal')) return;
+      const modal = document.getElementById('cv-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    // --------------------------------------------------------
+    // LANGUAGE SWITCHER
+    // --------------------------------------------------------
+    function applyLanguage() {
+      document.documentElement.lang = currentLang;
+      const dict = i18n[currentLang];
+
+      document.querySelectorAll('[data-i18n]').forEach((el) => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      const ruLabel = document.getElementById('lang-ru-label');
+      const enLabel = document.getElementById('lang-en-label');
+      if (currentLang === 'ru') {
+        ruLabel.className = 'text-emerald-400';
+        enLabel.className = 'text-gray-400';
+      } else {
+        ruLabel.className = 'text-gray-400';
+        enLabel.className = 'text-emerald-400';
+      }
+
+      renderProjects();
+      renderTerminalChart();
+    }
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'ru' ? 'en' : 'ru';
+      applyLanguage();
+    }
+
+    // --------------------------------------------------------
+    // CLIPBOARD & TOAST (iFrame-safe)
+    // --------------------------------------------------------
+    function copyEmail() {
+      const email = 'denis.razin.2007@gmail.com';
+      const tempInput = document.createElement('textarea');
+      tempInput.value = email;
+      tempInput.style.position = 'fixed';
+      tempInput.style.opacity = '0';
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        // Fallback ignored safely
+      }
+      document.body.removeChild(tempInput);
+      showToast(i18n[currentLang].toast_copied);
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'px-4 py-2.5 rounded-xl bg-[#111622] border border-emerald-500/40 text-emerald-300 font-mono text-xs shadow-xl';
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.25s ease';
+        setTimeout(() => toast.remove(), 260);
+      }, 2400);
+    }
+
+    // Close modals on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeProjectModal();
+        closeCvModal();
+      }
+    });
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      applyLanguage();
+    });
+  </script>
+</body>
+</html>
